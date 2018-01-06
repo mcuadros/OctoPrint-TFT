@@ -28,7 +28,7 @@ func (m *defaultPanel) initialize() {
 }
 
 func (m *defaultPanel) showStatus() {
-	m.UI.Add(StatusPanel(m.UI, m))
+	m.UI.Add(NewGraphPanel(m.UI))
 }
 
 func (m *defaultPanel) showHome() {
