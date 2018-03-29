@@ -28,7 +28,6 @@ For these reasons I developed this X application to be used with my 3d printer.
 Basic Installation
 ------------------
 
-(If you are having difficulty getting this working with your TFT, please see the wiki page: [TFT Installation Tips](https://github.com/CJeffyB/OctoPrint-TFT/wiki/TFT-Installation-Tips))
 
 ### Dependencies
 
@@ -76,6 +75,10 @@ To compile the project, assuming that you already cloned this repository, just e
 
 If you are using `Raspbian` you can install any of the `.deb` generated packages.
 If not, just use the compiled binary.
+
+
+If you are having difficulty getting this working with your TFT, please see the wiki page: [TFT Installation Tips](https://github.com/CJeffyB/OctoPrint-TFT/wiki/TFT-Installation-Tips)
+
 
 Configuration
 -------------
