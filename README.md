@@ -1,4 +1,4 @@
-## If you can't see you files list, try uploading a new file via OctoPrint - that seems to work!
+# If you can't see you files list, try uploading a new file via OctoPrint - that seems to work!
 
 
 Changes by devsfan1830: Implemented the hanging workaround here "https://github.com/mcuadros/OctoPrint-TFT/issues/34#issuecomment-417065437"
