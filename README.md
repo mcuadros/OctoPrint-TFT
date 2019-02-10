@@ -6,7 +6,7 @@ Changes by devsfan1830: Implemented the hanging workaround here "https://github.
 
 OctoPrint-TFT [![GitHub release](https://img.shields.io/github/release/mcuadros/OctoPrint-TFT.svg)](https://github.com/mcuadros/OctoPrint-TFT/releases) [![license](https://img.shields.io/github/license/mcuadros/OctoPrint-TFT.svg)]()
 =============
-### My changes to the original software (I'm also working on some bugs):
+### My (@noxhirsch) changes to the original software (I'm also working on some bugs):
 
 - Changed the order of the homescreen elements
 - Reworked status screen to have more space for the important stuff and smaller buttons
