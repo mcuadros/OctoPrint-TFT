@@ -45,6 +45,9 @@ func (m *systemPanel) createActionBar() gtk.IWidget {
 	bar.SetMarginBottom(5)
 	bar.SetMarginEnd(5)
 
+	if d := m.createShutdownButton(); d != nil {
+		bar.Add(d)
+	}
 	if b := m.createRestartButton(); b != nil {
 		bar.Add(b)
 	}
@@ -64,6 +67,27 @@ func (m *systemPanel) createRestartButton() gtk.IWidget {
 	var cmd *octoprint.CommandDefinition
 	for _, c := range r.Core {
 		if c.Action == "reboot" {
+			cmd = c
+		}
+	}
+
+	if cmd == nil {
+		return nil
+	}
+
+	return m.doCreateButtonFromCommand(cmd)
+}
+
+func (m *systemPanel) createShutdownButton() gtk.IWidget {
+	r, err := (&octoprint.SystemCommandsRequest{}).Do(m.UI.Printer)
+	if err != nil {
+		Logger.Error(err)
+		return nil
+	}
+
+	var cmd *octoprint.CommandDefinition
+	for _, c := range r.Core {
+		if c.Action == "shutdown" {
 			cmd = c
 		}
 	}
