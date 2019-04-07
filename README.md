@@ -51,11 +51,13 @@ Installation
 ## Install the GUI context
 First we need to make sure the GUI context is set up correctly and running on your TFT screen. For this, please follow the instructions, based on your specific installation:
 
+
 ### For Raspbian installation
 If you first installed Raspbian, and then manually installed Octoprint:
 ```sh
 sudo apt install lightdm
 ```
+If you have previously attempted to install Octoprint-TFT, during the follwing GUI installation process you could be asked whether to use Lightdm or Octoprint-TFT as your default window manager. Please select Lightdm for now.
 After installation is completed, reboot and make sure the GUI works on your TFT screen.
 NOTE: if the screen remains blank, you should try reinstalling the TFT screen drivers (depending on your screen make and model).
 
@@ -64,11 +66,12 @@ If you have installed Octopi directly. First you need to install GUI context:
 ```sh
 sudo /home/pi/scripts/install-desktop
 ```
+If you have previously attempted to install Octoprint-TFT, during the follwing GUI installation process you could be asked whether to use Lightdm or Octoprint-TFT as your default window manager. Please select Lightdm for now.
 Answer 'yes' to all questions. After installation is completed, reboot and make sure the GUI works on your TFT screen.
 NOTE: if the screen remains blank, you should try reinstalling the TFT screen drivers (depending on your screen make and model).
 
 ## Uninstall Lightdm window manager
-Prior to installation, remove Lightdm window, as it could interefere with the successful installation of OctoPrint TFT. In order to do this without removing dependencies that are also required by Octoprint-TFT, run:
+Prior to Octoprint-TFT installation, we need to remove Lightdm window manager, as it could interefere with the successful installation of OctoPrint TFT. In order to do this without removing dependencies that are also required by Octoprint-TFT, run:
 
 ```sh
 sudo dpkg -r --force-depends lightdm
