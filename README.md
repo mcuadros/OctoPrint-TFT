@@ -48,7 +48,33 @@ in my 3d printer.
 Installation
 ------------
 
-### Dependencies
+## Install the GUI context
+First we need to make sure the GUI context is set up correctly and running on your TFT screen. For this, please follow the instructions, based on your specific installation:
+
+### For Raspbian installation
+If you first installed Raspbian, and then manually installed Octoprint:
+```sh
+sudo apt install lightdm
+```
+After installation is completed, reboot and make sure the GUI works on your TFT screen.
+NOTE: if the screen remains blank, you should try reinstalling the TFT screen drivers (depending on your screen make and model).
+
+### For Octopi installation
+If you have installed Octopi directly. First you need to install GUI context:
+```sh
+sudo /home/pi/scripts/install-desktop
+```
+Answer 'yes' to all questions. After installation is completed, reboot and make sure the GUI works on your TFT screen.
+NOTE: if the screen remains blank, you should try reinstalling the TFT screen drivers (depending on your screen make and model).
+
+## Uninstall Lightdm window manager
+Prior to installation, remove Lightdm window, as it could interefere with the successful installation of OctoPrint TFT. In order to do this without removing dependencies that are also required by Octoprint-TFT, run:
+
+```sh
+sudo dpkg -r --force-depends lightdm
+```
+
+## Dependencies
 
 *OctoPrint-TFT* is based on [Golang](golang.org), usually this means that is
 dependency-less, but in this case [GTK+3](https://developer.gnome.org/gtk3/3.0/gtk.html)
@@ -72,13 +98,7 @@ IMPORTANT!!! In order for the DPMS management to work correctly, you need to ins
 sudo apt-get install x11-xserver-utils
 ```
 
-Prior to installation, I recommend removing Lightdm GUI, if installed, as it could interefere with the successful installation of OctoPrint TFT. In order to do this, without removing dependencies that are also required by Octoprint-TFT, run:
-
-```sh
-sudo dpkg -r --force-depends lightdm
-```
-
-### Installation on Raspbian/OctoPi (recommended)
+## Installation using the Debian installer for Raspbian/OctoPi (recommended)
 
 The recommended way to install *OctoPrint-TFT* is use the `.deb` packages
 from the [Releases](https://github.com/darksid3r/OctoPrint-TFT/releases) page. The packages
@@ -97,10 +117,10 @@ For example, for a Raspbian Stretch, version 1.1:
 > wget https://github.com/darksid3r/OctoPrint-TFT/releases/download/1.1/octoprint-tft_stretch_1.1.git91fa718-1_armhf.deb 
 > sudo dpkg -i octoprint-tft_stretch_1.1.git91fa718-1_armhf.deb 
 ```
-##Please note that in order to get the latest version of Octoprint-TFT for your specific Debian release, go to the "Releases" section of this page.
+### Please note that in order to get the latest version of Octoprint-TFT for your specific Debian release, go to the "Releases" section of this page.
 
 
-### Install from source
+## Install from source
 
 The compilation and packaging tasks are managed by the [`Makefile`](Makefile)
 and backed on [Docker](Dockerfile). Docker is used to avoid installing any other
