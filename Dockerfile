@@ -4,6 +4,8 @@ FROM ${IMAGE}
 ARG GO_TAGS
 ENV GO_TAGS=${GO_TAGS}
 
+RUN printf "deb http://archive.debian.org/debian/ jessie main\ndeb-src http://archive.debian.org/debian/ jessie main\ndeb http://security.debian.org jessie/updates main\ndeb-src http://security.debian.org jessie/updates main" > /etc/apt/sources.list
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
   git build-essential \
   debhelper devscripts fakeroot git-buildpackage dh-make dh-systemd dh-golang \
