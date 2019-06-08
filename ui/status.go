@@ -16,15 +16,16 @@ type statusPanel struct {
 	step *StepButton
 	pb   *gtk.ProgressBar
 
-	bed, tool0, tool1  *LabelWithImage
-	file, left         *LabelWithImage
-	print, pause, stop *gtk.Button
+	bed, tool0, tool1, tool2, tool3 *LabelWithImage
+	file, left                      *LabelWithImage
+	print, pause, stop              *gtk.Button
 }
 
 func StatusPanel(ui *UI, parent Panel) Panel {
 	if statusPanelInstance == nil {
 		m := &statusPanel{CommonPanel: NewCommonPanel(ui, parent)}
-		m.b = NewBackgroundTask(time.Second*5, m.update)
+		m.panelH = 3
+		m.b = NewBackgroundTask(time.Second*2, m.update)
 		m.initialize()
 
 		statusPanelInstance = m
@@ -36,10 +37,10 @@ func StatusPanel(ui *UI, parent Panel) Panel {
 func (m *statusPanel) initialize() {
 	defer m.Initialize()
 
-	m.Grid().Attach(m.createMainBox(), 1, 0, 4, 1)
-	m.Grid().Attach(m.createPrintButton(), 1, 1, 1, 1)
-	m.Grid().Attach(m.createPauseButton(), 2, 1, 1, 1)
-	m.Grid().Attach(m.createStopButton(), 3, 1, 1, 1)
+	m.Grid().Attach(m.createMainBox(), 1, 0, 4, 2)
+	m.Grid().Attach(m.createPrintButton(), 1, 2, 1, 1)
+	m.Grid().Attach(m.createPauseButton(), 2, 2, 1, 1)
+	m.Grid().Attach(m.createStopButton(), 3, 2, 1, 1)
 }
 
 func (m *statusPanel) createProgressBar() *gtk.ProgressBar {
@@ -86,6 +87,8 @@ func (m *statusPanel) createTemperatureBox() *gtk.Box {
 	m.bed = MustLabelWithImage("bed.svg", "")
 	m.tool0 = MustLabelWithImage("extruder.svg", "")
 	m.tool1 = MustLabelWithImage("extruder.svg", "")
+	m.tool2 = MustLabelWithImage("extruder.svg", "")
+	m.tool3 = MustLabelWithImage("extruder.svg", "")
 
 	temp := MustBox(gtk.ORIENTATION_VERTICAL, 5)
 	temp.SetHAlign(gtk.ALIGN_START)
@@ -94,6 +97,8 @@ func (m *statusPanel) createTemperatureBox() *gtk.Box {
 	temp.Add(m.bed)
 	temp.Add(m.tool0)
 	temp.Add(m.tool1)
+	temp.Add(m.tool2)
+	temp.Add(m.tool3)
 
 	return temp
 }
@@ -128,16 +133,9 @@ func (m *statusPanel) createPauseButton() gtk.IWidget {
 }
 
 func (m *statusPanel) createStopButton() gtk.IWidget {
-	m.stop = MustButtonImage("Stop", "stop.svg", func() {
-		defer m.updateTemperature()
-
-		Logger.Warning("Stopping job")
-		if err := (&octoprint.CancelRequest{}).Do(m.UI.Printer); err != nil {
-			Logger.Error(err)
-			return
-		}
-	})
-
+	m.stop = MustButtonImage("Stop", "stop.svg",
+		ConfirmStopDialog(m.UI.w, "Are you sure you want to stop current print?", m),
+	)
 	return m.stop
 }
 
@@ -156,6 +154,9 @@ func (m *statusPanel) updateTemperature() {
 	m.doUpdateState(&s.State)
 
 	m.tool1.Hide()
+	m.tool2.Hide()
+	m.tool3.Hide()
+
 	for tool, s := range s.Temperature.Current {
 		text := fmt.Sprintf("%s: %.0f°C / %.0f°C", strings.Title(tool), s.Actual, s.Target)
 		switch tool {
@@ -166,6 +167,12 @@ func (m *statusPanel) updateTemperature() {
 		case "tool1":
 			m.tool1.Label.SetLabel(text)
 			m.tool1.Show()
+		case "tool2":
+			m.tool2.Label.SetLabel(text)
+			m.tool2.Show()
+		case "tool3":
+			m.tool3.Label.SetLabel(text)
+			m.tool3.Show()
 		}
 	}
 }
@@ -220,15 +227,19 @@ func (m *statusPanel) updateJob() {
 	var text string
 	switch s.Progress.Completion {
 	case 100:
-		text = fmt.Sprintf("Job Completed in %s", time.Duration(int64(s.Job.LastPrintTime)*1e9))
+		text = fmt.Sprintf("Completed in %s", time.Duration(int64(s.Job.LastPrintTime)*1e9))
 	case 0:
 		text = "Warming up ..."
 	default:
+		Logger.Info(s.Progress.PrintTime)
+
 		e := time.Duration(int64(s.Progress.PrintTime) * 1e9)
 		l := time.Duration(int64(s.Progress.PrintTimeLeft) * 1e9)
-		text = fmt.Sprintf("Elapsed/Left: %s / %s", e, l)
+		// eta := time.Now().Add(l).Format("3:04 PM")
 		if l == 0 {
-			text = fmt.Sprintf("Elapsed: %s", e)
+			text = fmt.Sprintf("Print Time: %s", e)
+		} else {
+			text = fmt.Sprintf("Print Time: %s | Left: %s", e, l)
 		}
 	}
 
@@ -236,9 +247,52 @@ func (m *statusPanel) updateJob() {
 }
 
 func filenameEllipsis(name string) string {
-	if len(name) > 26 {
-		return name[:23] + "..."
+	l := len(name)
+	if l > 32 {
+		return name[:12] + "..." + name[l-17:l]
 	}
 
 	return name
+}
+
+func btou(b bool) uint8 {
+	if b {
+		return 1
+	}
+	return 0
+}
+
+func ConfirmStopDialog(parent *gtk.Window, msg string, ma *statusPanel) func() {
+	return func() {
+		win := gtk.MessageDialogNewWithMarkup(
+			parent,
+			gtk.DIALOG_MODAL,
+			gtk.MESSAGE_INFO,
+			gtk.BUTTONS_YES_NO,
+			"",
+		)
+
+		win.SetMarkup(CleanHTML(msg))
+		defer win.Destroy()
+
+		box, _ := win.GetContentArea()
+		box.SetMarginStart(15)
+		box.SetMarginEnd(15)
+		box.SetMarginTop(15)
+		box.SetMarginBottom(15)
+
+		ctx, _ := win.GetStyleContext()
+		ctx.AddClass("dialog")
+
+		ergebnis := win.Run()
+
+		if ergebnis == int(gtk.RESPONSE_YES) {
+
+			Logger.Warning("Stopping job")
+			if err := (&octoprint.CancelRequest{}).Do(ma.UI.Printer); err != nil {
+				Logger.Error(err)
+				return
+			}
+		}
+	}
 }

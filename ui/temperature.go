@@ -48,10 +48,10 @@ func (m *temperaturePanel) initialize() {
 	m.Grid().Attach(m.box, 2, 0, 2, 1)
 
 	m.Grid().Attach(m.createToolButton(), 1, 1, 1, 1)
-	m.amount = MustStepButton("move-step.svg", Step{"5°C", 5.}, Step{"10°C", 10.}, Step{"1°C", 1.})
+	m.amount = MustStepButton("move-step.svg", Step{"10°C", 10.}, Step{"5°C", 5.}, Step{"1°C", 1.})
 	m.Grid().Attach(m.amount, 2, 1, 1, 1)
 
-	m.Grid().Attach(MustButtonImage("Profiles", "heat-up.svg", m.profilePanel), 3, 1, 1, 1)
+	m.Grid().Attach(MustButtonImage("More", "heat-up.svg", m.profilePanel), 3, 1, 1, 1)
 }
 
 func (m *temperaturePanel) createToolButton() *StepButton {
@@ -69,13 +69,14 @@ func (m *temperaturePanel) createToolButton() *StepButton {
 }
 
 func (m *temperaturePanel) createChangeButton(label, image string, value float64) gtk.IWidget {
-	return MustButtonImage(label, image, func() {
+
+	return MustPressedButton(label, image, func() {
 		target := value * m.amount.Value().(float64)
 		if err := m.increaseTarget(m.tool.Value().(string), target); err != nil {
 			Logger.Error(err)
 			return
 		}
-	})
+	}, 100)
 }
 
 func (m *temperaturePanel) increaseTarget(tool string, value float64) error {
@@ -153,7 +154,7 @@ func (m *temperaturePanel) addNewTool(tool string) {
 	m.tool.AddStep(Step{strings.Title(tool), tool})
 	m.tool.Callback()
 
-	Logger.Infof("New tool detected %s", tool)
+	Logger.Infof("Tool detected %s", tool)
 }
 
 func (m *temperaturePanel) loadTemperatureData(tool string, d *octoprint.TemperatureData) {
@@ -211,6 +212,7 @@ func (m *profilesPanel) createProfileButton(img string, p *octoprint.Temperature
 		if err := m.setProfile(p); err != nil {
 			Logger.Error(err)
 		}
+		m.UI.GoHistory()
 	})
 }
 
