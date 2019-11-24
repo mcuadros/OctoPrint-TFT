@@ -1,3 +1,5 @@
+## This project has been archived, but @Z-Bolt has nicely reborn this project at  https://github.com/Z-Bolt/OctoScreen; take a look at it! Looks promising. 
+
 OctoPrint-TFT [![GitHub release](https://img.shields.io/github/release/mcuadros/OctoPrint-TFT.svg)](https://github.com/mcuadros/OctoPrint-TFT/releases) [![license](https://img.shields.io/github/license/mcuadros/OctoPrint-TFT.svg)]()
 =============
 
